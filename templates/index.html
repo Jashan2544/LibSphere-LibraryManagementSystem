@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System - Dashboard</title>
+    <!-- Google Fonts: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-book-open-reader"></i>
+                </div>
+                <h2>LibSphere</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" data-tab="dashboard-tab" id="btn-nav-dashboard">
+                    <i class="fa-solid fa-chart-line"></i> <span>Dashboard</span>
+                </button>
+                <button class="nav-btn" data-tab="books-tab" id="btn-nav-books">
+                    <i class="fa-solid fa-book"></i> <span>Books</span>
+                </button>
+                <button class="nav-btn" data-tab="members-tab" id="btn-nav-members">
+                    <i class="fa-solid fa-users"></i> <span>Members</span>
+                </button>
+                <button class="nav-btn" data-tab="issue-tab" id="btn-nav-issue">
+                    <i class="fa-solid fa-hand-holding-hand"></i> <span>Issue Book</span>
+                </button>
+                <button class="nav-btn" data-tab="return-tab" id="btn-nav-return">
+                    <i class="fa-solid fa-reply"></i> <span>Return Book</span>
+                </button>
+                <button class="nav-btn" data-tab="transactions-tab" id="btn-nav-transactions">
+                    <i class="fa-solid fa-clock-rotate-left"></i> <span>Transactions</span>
+                </button>
+                <button class="nav-btn" data-tab="about-tab" id="btn-nav-about">
+                    <i class="fa-solid fa-circle-info"></i> <span>About Backend</span>
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="version">Version 2.0.0</span>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="main-header">
+                <h1 id="page-title">Dashboard Summary</h1>
+                <div class="header-right">
+                    <div class="date-display" id="current-date">--:--:--</div>
+                </div>
+            </header>
+
+            <!-- 1. DASHBOARD TAB -->
+            <section id="dashboard-tab" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card blue-gradient">
+                        <div class="stat-info">
+                            <h3>Total Books</h3>
+                            <p id="stat-total-books" class="stat-val">0</p>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-book-bookmark"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card green-gradient">
+                        <div class="stat-info">
+                            <h3>Available Books</h3>
+                            <p id="stat-available-books" class="stat-val">0</p>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-square-check"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card orange-gradient">
+                        <div class="stat-info">
+                            <h3>Issued Books</h3>
+                            <p id="stat-issued-books" class="stat-val">0</p>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card purple-gradient">
+                        <div class="stat-info">
+                            <h3>Total Members</h3>
+                            <p id="stat-total-members" class="stat-val">0</p>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-user-group"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-details">
+                    <!-- Quick Actions -->
+                    <div class="panel glass-panel">
+                        <h2>Quick Controls</h2>
+                        <div class="quick-actions-grid">
+                            <button class="action-btn" onclick="switchTab('issue-tab')">
+                                <i class="fa-solid fa-plus-circle"></i> Issue New Book
+                            </button>
+                            <button class="action-btn" onclick="switchTab('return-tab')">
+                                <i class="fa-solid fa-arrow-rotate-left"></i> Return a Book
+                            </button>
+                            <button class="action-btn" onclick="openBookModal()">
+                                <i class="fa-solid fa-book-medical"></i> Add New Book
+                            </button>
+                            <button class="action-btn" onclick="openMemberModal()">
+                                <i class="fa-solid fa-user-plus"></i> Add New Member
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Short Overview Table -->
+                    <div class="panel glass-panel">
+                        <h2>Recent Books Added</h2>
+                        <div class="table-container">
+                            <table id="recent-books-table">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Author</th>
+                                        <th>ISBN</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-books-body">
+                                    <tr>
+                                        <td colspan="4" class="text-center">Loading books...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. BOOKS TAB -->
+            <section id="books-tab" class="tab-content">
+                <div class="panel glass-panel">
+                    <div class="panel-header">
+                        <h2>Book Inventory</h2>
+                        <div class="panel-actions">
+                            <div class="search-bar">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" id="book-search" placeholder="Search title, author, isbn..." oninput="filterBooks()">
+                            </div>
+                            <button class="btn btn-primary" onclick="openBookModal()" id="btn-add-book">
+                                <i class="fa-solid fa-plus"></i> Add Book
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="books-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <th>ISBN</th>
+                                    <th>Published Year</th>
+                                    <th>Total Copies</th>
+                                    <th>Available</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="books-table-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. MEMBERS TAB -->
+            <section id="members-tab" class="tab-content">
+                <div class="panel glass-panel">
+                    <div class="panel-header">
+                        <h2>Member Directory</h2>
+                        <div class="panel-actions">
+                            <div class="search-bar">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" id="member-search" placeholder="Search by name, email..." oninput="filterMembers()">
+                            </div>
+                            <button class="btn btn-primary" onclick="openMemberModal()" id="btn-add-member">
+                                <i class="fa-solid fa-plus"></i> Add Member
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="members-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="members-table-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. ISSUE BOOK TAB -->
+            <section id="issue-tab" class="tab-content">
+                <div class="panel glass-panel centered-panel">
+                    <div class="panel-icon blue-text">
+                        <i class="fa-solid fa-hand-holding-hand"></i>
+                    </div>
+                    <h2>Issue a Book</h2>
+                    <p class="panel-subtitle">Create a borrowing transaction record and reduce the book shelf quantity.</p>
+                    
+                    <form id="issue-book-form" onsubmit="handleIssueSubmit(event)" novalidate>
+                        <div class="form-group">
+                            <label for="issue-book-select">Select Book <span class="required">*</span></label>
+                            <select id="issue-book-select" required>
+                                <option value="" disabled selected>-- Choose Available Book --</option>
+                            </select>
+                            <small class="error-msg" id="err-issue-book"></small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="issue-member-select">Select Member <span class="required">*</span></label>
+                            <select id="issue-member-select" required>
+                                <option value="" disabled selected>-- Choose Registered Member --</option>
+                            </select>
+                            <small class="error-msg" id="err-issue-member"></small>
+                        </div>
+
+                        <div class="form-actions-full">
+                            <button type="submit" class="btn btn-primary btn-full" id="btn-submit-issue">
+                                <i class="fa-solid fa-check"></i> Complete Issue Transaction
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- 5. RETURN BOOK TAB -->
+            <section id="return-tab" class="tab-content">
+                <div class="panel glass-panel centered-panel">
+                    <div class="panel-icon orange-text">
+                        <i class="fa-solid fa-arrow-rotate-left"></i>
+                    </div>
+                    <h2>Return a Book</h2>
+                    <p class="panel-subtitle">Mark a borrowing transaction returned and restore book shelf quantity.</p>
+
+                    <form id="return-book-form" onsubmit="handleReturnSubmit(event)" novalidate>
+                        <div class="form-group">
+                            <label for="return-tx-select">Select Active Transaction <span class="required">*</span></label>
+                            <select id="return-tx-select" required>
+                                <option value="" disabled selected>-- Choose Issued Transaction --</option>
+                            </select>
+                            <small class="error-msg" id="err-return-tx"></small>
+                        </div>
+
+                        <div class="form-actions-full">
+                            <button type="submit" class="btn btn-warning btn-full" id="btn-submit-return">
+                                <i class="fa-solid fa-arrow-right-to-bracket"></i> Mark as Returned
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- 6. TRANSACTIONS TAB -->
+            <section id="transactions-tab" class="tab-content">
+                <div class="panel glass-panel">
+                    <div class="panel-header">
+                        <h2>Borrowing Logs & History</h2>
+                        <div class="panel-actions">
+                            <div class="search-bar">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" id="tx-search" placeholder="Search by book or member..." oninput="filterTransactions()">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="transactions-table">
+                            <thead>
+                                <tr>
+                                    <th>Tx ID</th>
+                                    <th>Book Title</th>
+                                    <th>ISBN</th>
+                                    <th>Member Name</th>
+                                    <th>Issue Date</th>
+                                    <th>Return Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-table-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. ABOUT FLASK TAB -->
+            <section id="about-tab" class="tab-content">
+                <div class="panel glass-panel">
+                    <h2>Flask Backend Framework Architecture</h2>
+                    <p class="about-desc">This system uses Python's micro-framework **Flask** as the backend engine. Below is a detailed breakdown of the application routing and database operations.</p>
+                    
+                    <div class="about-grid" id="about-content">
+                        <!-- Filled by JS from /api/about -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- BOOK MODAL (ADD / EDIT) -->
+    <div id="book-modal" class="modal">
+        <div class="modal-content glass-panel animate-scale">
+            <div class="modal-header">
+                <h2 id="book-modal-title">Add New Book</h2>
+                <button class="close-modal" onclick="closeBookModal()">&times;</button>
+            </div>
+            <form id="book-form" onsubmit="handleBookSubmit(event)" novalidate>
+                <input type="hidden" id="book-id-input">
+                
+                <div class="form-group">
+                    <label for="book-title-input">Book Title <span class="required">*</span></label>
+                    <input type="text" id="book-title-input" placeholder="e.g. The Hobbit" required>
+                    <small class="error-msg" id="err-book-title"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="book-author-input">Author <span class="required">*</span></label>
+                    <input type="text" id="book-author-input" placeholder="e.g. J.R.R. Tolkien" required>
+                    <small class="error-msg" id="err-book-author"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="book-isbn-input">ISBN Number <span class="required">*</span></label>
+                    <input type="text" id="book-isbn-input" placeholder="e.g. 9780007117116" required>
+                    <small class="error-msg" id="err-book-isbn"></small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label for="book-year-input">Published Year <span class="required">*</span></label>
+                        <input type="number" id="book-year-input" min="1000" max="2100" placeholder="e.g. 1937" required>
+                        <small class="error-msg" id="err-book-year"></small>
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="book-quantity-input">Total Quantity <span class="required">*</span></label>
+                        <input type="number" id="book-quantity-input" min="1" max="100" placeholder="e.g. 5" required>
+                        <small class="error-msg" id="err-book-quantity"></small>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeBookModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-book">Save Book</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MEMBER MODAL (ADD / EDIT) -->
+    <div id="member-modal" class="modal">
+        <div class="modal-content glass-panel animate-scale">
+            <div class="modal-header">
+                <h2 id="member-modal-title">Add New Member</h2>
+                <button class="close-modal" onclick="closeMemberModal()">&times;</button>
+            </div>
+            <form id="member-form" onsubmit="handleMemberSubmit(event)" novalidate>
+                <input type="hidden" id="member-id-input">
+                
+                <div class="form-group">
+                    <label for="member-name-input">Full Name <span class="required">*</span></label>
+                    <input type="text" id="member-name-input" placeholder="e.g. John Doe" required>
+                    <small class="error-msg" id="err-member-name"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="member-email-input">Email Address <span class="required">*</span></label>
+                    <input type="email" id="member-email-input" placeholder="e.g. john@example.com" required>
+                    <small class="error-msg" id="err-member-email"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="member-phone-input">Phone Number <span class="required">*</span></label>
+                    <input type="tel" id="member-phone-input" placeholder="e.g. +1234567890" required>
+                    <small class="error-msg" id="err-member-phone"></small>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeMemberModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-member">Save Member</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom JS script -->
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
